@@ -1,10 +1,8 @@
 #include "gameboy-emulator/core/cpu.hpp"
-#include "gameboy-emulator/core/alu.hpp"
+
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/core/instructions.hpp"
 #include "gameboy-emulator/core/memory.hpp"
-
-#include <iostream>
 
 namespace emulator {
 

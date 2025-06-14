@@ -1,4 +1,3 @@
-#include <cctype>
 #define CATCH_CONFIG_MAIN
 
 #include <fstream>
@@ -95,7 +94,7 @@ void check_final_mem(json &data)
         std::cout << "l: " << (int)CPU::get_l() << " vs " << data["l"]  << std::endl;
         std::cout << "pc: " << (int)CPU::get_pc() << " vs " << data["pc"]  << std::endl;
         std::cout << "sp: " << (int)CPU::get_sp() << " vs " << data["sp"]  << std::endl;
-        
+
         for (json &outer: data["ram"])
         {
             std::cout << "ram " << (int)outer[0] << ": " << (int)*Memory::get_8b((uint16_t)outer[0]) << " vs " << (int)outer[1]  << std::endl;

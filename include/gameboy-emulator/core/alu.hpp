@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "gameboy-emulator/core/bytelib.hpp"
-
 namespace emulator::alu
 {
 

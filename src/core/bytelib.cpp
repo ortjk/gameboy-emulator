@@ -1,7 +1,5 @@
 #include "gameboy-emulator/core/bytelib.hpp"
 
-#include <iostream>
-
 namespace emulator
 {
 

@@ -1,7 +1,6 @@
 #include "gameboy-emulator/core/alu.hpp"
-#include "gameboy-emulator/core/bytelib.hpp"
 
-#include <iostream>
+#include "gameboy-emulator/core/bytelib.hpp"
 
 namespace emulator::alu
 {
