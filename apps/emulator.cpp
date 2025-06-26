@@ -1,12 +1,6 @@
-#include <iostream>
-#include <cstdint>
-
-#include "gameboy-emulator/core/cpu.hpp"
+#include "gameboy-emulator/graphics/window.hpp"
 
 int main(int argc, char* argv[])
 {
-  
-  uint8_t x = 128;
-  x = x << 1;
-  std::cout << "hello, world!" << std::endl;
+    emulator::Window::open();
 }

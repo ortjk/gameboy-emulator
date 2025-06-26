@@ -24,9 +24,11 @@ private:
     // FF80     FFFE     High RAM
     // FFFF     FFFF     Interrupt enable register
 
-    static uint8_t registers[65536];
+    static uint8_t _registers[65536];
 
 public:
+    static const uint8_t *registers() { return _registers; }
+
     static uint8_t *get_8b(const uint16_t &address);
     static uint16_t *get_16b(const uint16_t &address);
 
