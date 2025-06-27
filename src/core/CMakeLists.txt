@@ -1,10 +1,12 @@
-set(SOURCE_LIST cpu.cpp
+set(SOURCE_LIST motherboard.cpp
+                cpu.cpp
                 memory.cpp
                 instructions.cpp
                 alu.cpp
                 bytelib.cpp)
 
-set(HEADER_LIST "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/cpu.hpp" 
+set(HEADER_LIST "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/motherboard.hpp" 
+                "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/cpu.hpp" 
                 "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/memory.hpp" 
                 "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/instructions.hpp"
                 "${GameboyEmulator_SOURCE_DIR}/include/gameboy-emulator/core/alu.hpp"
