@@ -41,10 +41,10 @@ uint8_t GPU::get_tile_pixel(const uint8_t *tile_data, const uint8_t &x, const ui
 
 void GPU::render_background_line(uint8_t* pixels, const int &y)
 {
-    for (int x = 0; x < 144; x++)
+    for (int x = 0; x < 160; x++)
     {
         uint8_t tile = tile_map0[PIXELS_TO_TILE_MAP(x, y)];
-        pixels[x + (y * 144)] = get_tile_pixel(&tile_data0[tile], x, y);
+        pixels[x + (y * 160)] = get_tile_pixel(&tile_data0[tile], x, y);
     }
 }
 
@@ -55,10 +55,13 @@ void GPU::render_object_line(uint8_t* pixels, const int &y)
 
 void GPU::render(uint8_t* pixels)
 {
-    for (int y = 0; y < 160; y++)
+    uint8_t *ly = Memory::get_8b(0xFF44);
+    for (int y = 0; y < 144; y++)
     {
+        *ly = static_cast<uint8_t>(y);
         render_background_line(pixels, y);
     }
+    *ly = 144;
 }
 
 } // namespace emulator

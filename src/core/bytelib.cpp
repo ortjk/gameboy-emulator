@@ -55,4 +55,9 @@ void reset_bit(int i, uint16_t &b)
     }
 }
 
+bool check_bit(int i, const uint8_t &b)
+{
+    return (b >> i) & 1;
+}
+
 } // namespace emulator

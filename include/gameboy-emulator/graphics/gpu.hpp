@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "gameboy-emulator/core/memory.hpp"
+#include "gameboy-emulator/core/cpu.hpp"
 
 #define PIXELS_TO_TILE_MAP(x, y) ((x / 8) + ((y / 8) * 32))
 

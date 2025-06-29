@@ -7,41 +7,65 @@
 namespace emulator {
 
 GLFWwindow *Window::window = nullptr;
-uint8_t Window::pixels[144 * 160] = {};
+uint8_t Window::pixels[160 * 144] = {};
 
 void Window::init_window()
 {
     glfwInit();
-    window = glfwCreateWindow(144, 160, "emulator", NULL, NULL);
+    window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     glewInit();
-    glOrtho(0, 144, 0, 160, 1, -1);
-    glViewport(72, 80, 144, 160);
+    glOrtho(0, 160, 0, 144, 1, -1);
+    glViewport(80, 72, 160, 144);
 }
 
 void Window::render()
 {
+    double t0 = 1.;
+    double t1 = glfwGetTime();
+    double dt;
+    double mc; // master clock
+    double vc; // visuals clock
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.00f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        t0 = glfwGetTime();
+        dt = t0 - t1;
+        t1 = t0;
+        
+        mc += dt;
+        vc += dt;
 
-        glBegin(GL_POINTS);
-            GPU::render(pixels);
+        if (mc >= (1. / 4194304.))
+        {
+            mc = 0;
 
-            for (int y = 0; y < 160; y++)
-            {
-                for (int x = 0; x < 144; x++)
+            Motherboard::read_rom();
+        }
+
+        if (vc >= (1. / 59.73))
+        {
+            vc = 0;
+
+            glClearColor(0.00f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            glBegin(GL_POINTS);
+                GPU::render(pixels);
+
+                for (int y = 0; y < 144; y++)
                 {
-                    uint8_t color = pixels[x + (y * 144)];
-                    glColor3f(color / 64.f, color / 64.f, 0);
-                    glVertex3f((float)x, (float)y, 0.0f);
+                    for (int x = 0; x < 160; x++)
+                    {
+                        uint8_t color = pixels[x + (y * 160)];
+                        glColor3f(color / 64.f, color / 64.f, 0);
+                        glVertex3f((float)x, (float)y, 0.0f);
+                    }
                 }
-            }
-        glEnd();
+            glEnd();
 
-        glfwSwapBuffers(window);
+            glfwSwapBuffers(window);
+        }
 
         glfwPollEvents();
     }

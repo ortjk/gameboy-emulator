@@ -4,6 +4,12 @@
 
 #include "gameboy-emulator/core/alu.hpp"
 
+#define VBANK_INT 0x40
+#define STAT_INT 0x48
+#define TIMER_INT 0x50
+#define SERIAL_INT 0x58
+#define JOYPAD_INT 0x60
+
 namespace emulator {
 
 struct opcode_values {
@@ -21,7 +27,9 @@ private:
     static uint16_t de;
     static uint16_t hl;
     static uint16_t sp; // stack pointer
-    static uint16_t pc; // program counter
+    
+    static bool ime; // interrupt master enable flag
+    static bool pre_ime; // pre-interrupt state of ime
 
     // 8-bit register table
     static uint8_t *r[8];
@@ -52,6 +60,7 @@ private:
 
 public:
     static uint16_t t;
+    static uint16_t pc; // program counter
 
     /**@brief Emulate a GameBoy Z80 instruction.
      *
@@ -61,6 +70,8 @@ public:
      * @param b0 Fourth byte of instruction
      */
     static void instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, const uint8_t &b0);
+
+    static void interrupt(const uint8_t &code);
 
 #ifdef CMAKE_BUILD_TESTING
     /**@brief Helper function for testing to directly set a

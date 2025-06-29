@@ -12,6 +12,21 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         include(CTest)
         add_subdirectory(tests)
     endif()
+
+    if (LOG_CPU_INSTRUCTIONS)
+        set(CMAKE_LOG_CPU_INSTRUCTIONS ON)
+        add_compile_definitions(CMAKE_LOG_CPU_INSTRUCTIONS)
+    endif()
+
+    if (LOG_MEMORY_8000_9FFF)
+        set(CMAKE_LOG_MEMORY_8000_9FFF ON)
+        add_compile_definitions(CMAKE_LOG_MEMORY_8000_9FFF)
+    endif()
+
+    if (LOG_MEMORY_FF00_FFFF)
+        set(CMAKE_LOG_MEMORY_FF00_FFFF ON)
+        add_compile_definitions(CMAKE_LOG_MEMORY_FF00_FFFF)
+    endif()
 endif()
 
 find_package(OpenGL REQUIRED)
