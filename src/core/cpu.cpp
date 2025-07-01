@@ -180,7 +180,6 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     {
                         if (!check_bit(7, *f))
                         {
-                            std::cout << "previous pc: " << std::hex << pc << std::endl;
                             jr(pc, b2);
                             t = 12;
                         }
@@ -567,10 +566,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     t = 4;
                 }
 
-                std::cout << std::hex << "arithmetic a=a+" << (int)*target;
                 uint8_t _;
                 al[ocv.y](_, *target, *f);
-                std::cout << std::hex << "=" << (af >> 8) << std::endl;
                 pc += 1;
             }
             break;
@@ -831,6 +828,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         ld(*reg, *a);
                         t = 16;
                         pc += 3;
+                        std::cout << std::hex << "load a into " << nn << " result: " << (int)*Memory::get_8b(nn) << std::endl;
                     }
                     break;
                 case 6:
@@ -1016,7 +1014,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
     }
 
 #ifdef CMAKE_LOG_CPU_INSTRUCTIONS
-    std::cout << std::hex << "--------CPU INSTRUCTION--------" << std::endl
+    std::cout << std::endl << std::hex << "--------CPU INSTRUCTION--------" << std::endl
         << "bytes: " << (int)b3 << " " << (int)b2 << " " << (int)b1 << " " << (int)b0 << std::endl
         << "cpu regs " << "af: " << af << ", bc: " << bc << ", de: " << de << ", hl: " << hl << ", sp: " << sp << std::endl
         << "new pc: " << pc << std::endl
@@ -1026,14 +1024,15 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
 #ifdef CMAKE_LOG_MEMORY_8000_9FFF
     for (uint16_t i = 0x8000; i <= 0x9FFF; i++)
     {
-        std::cout << std::hex << "[" << (int)i << ":" << (int)Memory::get_8b(i) << "], ";
+        std::cout << std::hex << "[" << (int)i << ":" << (int)*Memory::get_8b(i) << "], ";
     }
 #endif
-#ifdef CMAKE_LOG_MEMORY_8000_9FFF
-    for (uint16_t i = 0x8000; i <= 0x9FFF; i++)
+#ifdef CMAKE_LOG_MEMORY_FF00_FFFF
+    for (uint16_t i = 0xFF00; i < 0xFFFF; i++)
     {
-        std::cout << std::hex << "[" << (int)i << ":" << (int)Memory::get_8b(i) << "], ";
+        std::cout << std::hex << "[" << (int)i << ":" << (int)*Memory::get_8b(i) << "], ";
     }
+    std::cout << std::hex << "[" << (int)0xFFFF << ":" << (int)*Memory::get_8b(0xFFFF) << "], ";
 #endif
 
 }

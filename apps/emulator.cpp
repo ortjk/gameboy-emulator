@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
         }
         else 
         {
-            emulator::Motherboard::load_rom(rom);
+            // emulator::Motherboard::load_rom(rom);
         }
         emulator::Window::open();
 

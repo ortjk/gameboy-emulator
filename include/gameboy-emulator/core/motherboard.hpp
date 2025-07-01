@@ -3,13 +3,12 @@
 #include <cstdint>
 
 #include "gameboy-emulator/core/cpu.hpp"
+#include "gameboy-emulator/core/memory.hpp"
 
 namespace emulator {
 
 class Motherboard {
 private:
-    static uint8_t *pm; // program memory
-    
     static void bootrom_emu();
 public:
     static void read_rom();
