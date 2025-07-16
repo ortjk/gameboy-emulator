@@ -1,5 +1,7 @@
 #include "gameboy-emulator/core/cpu.hpp"
 
+#include <iostream>
+
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/core/instructions.hpp"
 #include "gameboy-emulator/core/memory.hpp"
@@ -10,8 +12,9 @@ uint16_t CPU::af = 0x0000;
 uint16_t CPU::bc = 0x0000;
 uint16_t CPU::de = 0x0000;
 uint16_t CPU::hl = 0x0000;
-uint16_t CPU::sp = 0xFFFF;
-uint16_t CPU::pc = 0x0000;
+uint16_t CPU::sp = 0x0000;
+
+bool CPU::ime = false;
 
 uint8_t *CPU::r[8] = {
     reinterpret_cast<uint8_t *>(&bc)+1, reinterpret_cast<uint8_t *>(&bc), 
@@ -57,6 +60,7 @@ opcode_values CPU::get_opcode_values(const uint8_t &opcode)
 }
 
 uint16_t CPU::t = 0;
+uint16_t CPU::pc = 0x0000;
 
 // instruction set meaning:
 // 4 byte opcodes (bracketed items may or may not be present)
@@ -93,7 +97,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
         uint8_t* target;
         if (ocv.z == 0x6 || ocv.z == 0xE)
         {
-            target = Memory::get_8b(hl);
+            target = &Memory::registers[hl];
             t = 16;
         }
         else
@@ -173,8 +177,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 4:
                     // JR nz, d
                     {
-                        bool z = *f >> 7;
-                        if (!z)
+                        if (!check_bit(7, *f))
                         {
                             jr(pc, b2);
                             t = 12;
@@ -189,8 +192,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 5:
                     // JR z, d
                     {
-                        bool z = *f >> 7;
-                        if (z)
+                        if (check_bit(7, *f))
                         {
                             jr(pc, b2);
                             t = 12;
@@ -205,8 +207,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 6:
                     // JR nc, d
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (!c)
+                        if (!check_bit(4, *f))
                         {
                             jr(pc, b2);
                             t = 12;
@@ -221,8 +222,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 7:
                     // JR c, d
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (c)
+                        if (check_bit(4, *f))
                         {
                             jr(pc, b2);
                             t = 12;
@@ -275,7 +275,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 0:
                             // ld (bc), a
                             {
-                                uint8_t *reg = Memory::get_8b(bc);
+                                uint8_t *reg = &Memory::registers[bc];
                                 ld(*reg, *a);
                                 t = 8;
                                 pc += 1;
@@ -284,7 +284,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 1:
                             // ld (de), a
                             {
-                                uint8_t *reg = Memory::get_8b(de);
+                                uint8_t *reg = &Memory::registers[de];
                                 ld(*reg, *a);
                                 t = 8;
                                 pc += 1;
@@ -293,7 +293,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 2:
                             // ld (hl+), a
                             {
-                                uint8_t *reg = Memory::get_8b(hl);
+                                uint8_t *reg = &Memory::registers[hl];
                                 ld(*reg, *a);
                                 alu::inc(hl, *f);
                                 t = 8;
@@ -303,7 +303,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 3:
                             // ld (hl-), a
                             {
-                                uint8_t *reg = Memory::get_8b(hl);
+                                uint8_t *reg = &Memory::registers[hl];
                                 ld(*reg, *a);
                                 alu::dec(hl, *f);
                                 t = 8;
@@ -320,7 +320,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 0:
                             // ld a, (bc)
                             {
-                                uint8_t *reg = Memory::get_8b(bc);
+                                uint8_t *reg = &Memory::registers[bc];
                                 ld(*a, *reg);
                                 t = 8;
                                 pc += 1;
@@ -329,7 +329,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 1:
                             // ld a, (de)
                             {
-                                uint8_t *reg = Memory::get_8b(de);
+                                uint8_t *reg = &Memory::registers[de];
                                 ld(*a, *reg);
                                 t = 8;
                                 pc += 1;
@@ -338,7 +338,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 2:
                             // ld a, (hl+)
                             {
-                                uint8_t *reg = Memory::get_8b(hl);
+                                uint8_t *reg = &Memory::registers[hl];
                                 ld(*a, *reg);
                                 alu::inc(hl, *f);
                                 t = 8;
@@ -348,7 +348,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         case 3:
                             // ld a, (hl-)
                             {
-                                uint8_t *reg = Memory::get_8b(hl);
+                                uint8_t *reg = &Memory::registers[hl];
                                 ld(*a, *reg);
                                 alu::dec(hl, *f);
                                 t = 8;
@@ -395,7 +395,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     uint8_t *target;
                     if (ocv.y == 6)
                     {
-                        target = Memory::get_8b(hl);
+                        target = &Memory::registers[hl];
                         t = 12;
                     }
                     else 
@@ -413,7 +413,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     uint8_t *target;
                     if (ocv.y == 6)
                     {
-                        target = Memory::get_8b(hl);
+                        target = &Memory::registers[hl];
                         t = 12;
                     }
                     else 
@@ -431,7 +431,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     uint8_t *target;
                     if (ocv.y == 6)
                     {
-                        target = Memory::get_8b(hl);
+                        target = &Memory::registers[hl];
                         t = 12;
                     }
                     else 
@@ -512,7 +512,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
         case 1:
             if (ocv.z == 6 && ocv.y == 6)
             {
-                // exception
+                // HALT
+                // TODO wait until interrupt
+                t = 4;
             }
             else 
             {
@@ -520,7 +522,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 uint8_t *target;
                 if (ocv.y == 6)
                 {
-                    target = Memory::get_8b(hl);
+                    target = &Memory::registers[hl];
                 }
                 else 
                 {
@@ -530,7 +532,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 uint8_t *val;
                 if (ocv.z == 6)
                 {
-                    val = Memory::get_8b(hl);
+                    val = &Memory::registers[hl];
                 }
                 else
                 {
@@ -556,7 +558,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 uint8_t *target;
                 if (ocv.z == 6)
                 {
-                    target = Memory::get_8b(hl);
+                    target = &Memory::registers[hl];
                     t = 8;
                 }
                 else 
@@ -579,8 +581,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 0:
                     // RET nz
                     {
-                        bool z = *f >> 7;
-                        if (!z)
+                        if (!check_bit(7, *f))
                         {
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
@@ -596,8 +597,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 1:
                     // RET z
                     {
-                        bool z = *f >> 7;
-                        if (z)
+                        if (check_bit(7, *f))
                         {
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
@@ -613,8 +613,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 2:
                     // RET nc
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (!c)
+                        if (!check_bit(4, *f))
                         {
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
@@ -630,8 +629,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 3:
                     // RET c
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (c)
+                        if (check_bit(4, *f))
                         {
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
@@ -648,10 +646,16 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD (0xFF00 + n), a
                     {
                         uint8_t *a = reinterpret_cast<uint8_t *>(&af)+1;
-                        uint8_t *reg = Memory::get_8b(0xFF00 + static_cast<uint16_t>(b2));
+                        uint8_t *reg = &Memory::registers[0xFF00 + static_cast<uint16_t>(b2)];
                         ld(*reg, *a);
                         t = 12;
                         pc += 2;
+
+                        // check if bootrom is exiting
+                        if (pc == 0x100 && *reg != 0x00)
+                        {
+                            Memory::unmap_dmg();
+                        }
                     }
                     break;
                 case 5:
@@ -664,7 +668,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD A, (0xFF00 + n)
                     {
                         uint8_t *a = reinterpret_cast<uint8_t *>(&af)+1;
-                        uint8_t *reg = Memory::get_8b(0xFF00 + static_cast<uint16_t>(b2));
+                        uint8_t *reg = &Memory::registers[0xFF00 + static_cast<uint16_t>(b2)];
                         ld(*a, *reg);
                         t = 12;
                         pc += 2;
@@ -712,19 +716,17 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         break;
                     case 1:
                         // RETI
-                        // TODO: implement interrupts
                         {
+                            ime = true;
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
-                            t = 16;
-                            pc += 1;
+                            t = 4;
                         }
                         break;
                     case 2:
                         // JP HL
                         jp(pc, hl);
                         t = 4;
-                        pc += 1;
                         break;
                     case 3:
                         // LD SP, HL
@@ -748,13 +750,11 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 0:
                     // JP NZ, nn
                     {
-                        bool z = *f >> 7;
-                        if (!z)
+                        if (!check_bit(7, *f))
                         {
                             uint16_t nn = bytes_to_16b(b1, b2);
                             jp(pc, nn);
                             t = 16;
-                            pc += 1;
                         }
                         else
                         {
@@ -766,13 +766,11 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 1:
                     // JP Z, nn
                     {
-                        bool z = *f >> 7;
-                        if (z)
+                        if (check_bit(7, *f))
                         {
                             uint16_t nn = bytes_to_16b(b1, b2);
                             jp(pc, nn);
                             t = 16;
-                            pc += 1;
                         }
                         else
                         {
@@ -784,13 +782,11 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 2:
                     // JP NC, nn
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (!c)
+                        if (!check_bit(4, *f))
                         {
                             uint16_t nn = bytes_to_16b(b1, b2);
                             jp(pc, nn);
                             t = 16;
-                            pc += 1;
                         }
                         else
                         {
@@ -802,13 +798,11 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 case 3:
                     // JP C, nn
                     {
-                        bool c = (*f >> 4) & 1;
-                        if (c)
+                        if (check_bit(4, *f))
                         {
                             uint16_t nn = bytes_to_16b(b1, b2);
                             jp(pc, nn);
                             t = 16;
-                            pc += 1;
                         }
                         else
                         {
@@ -821,7 +815,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD (0xFF00 + C),A
                     {
                         uint8_t *c = reinterpret_cast<uint8_t *>(&bc);
-                        uint8_t *reg = Memory::get_8b(0xFF00 + *c);
+                        uint8_t *reg = &Memory::registers[0xFF00 + *c];
                         ld(*reg, *a);
                         t = 8;
                         pc += 1;
@@ -831,7 +825,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD (nn), A
                     {
                         uint16_t nn = bytes_to_16b(b1, b2);
-                        uint8_t *reg = Memory::get_8b(nn);
+                        uint8_t *reg = &Memory::registers[nn];
                         ld(*reg, *a);
                         t = 16;
                         pc += 3;
@@ -841,7 +835,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD A, (0xFF00 + C)
                     {
                         uint8_t *c = reinterpret_cast<uint8_t *>(&bc);
-                        uint8_t *reg = Memory::get_8b(0xFF00 + *c);
+                        uint8_t *reg = &Memory::registers[0xFF00 + *c];
                         ld(*a, *reg);
                         t = 8;
                         pc += 1;
@@ -851,7 +845,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     // LD A, (nn)
                     {
                         uint16_t nn = bytes_to_16b(b1, b2);
-                        uint8_t *reg = Memory::get_8b(nn);
+                        uint8_t *reg = &Memory::registers[nn];
                         ld(*a, *reg);
                         t = 16;
                         pc += 3;
@@ -871,14 +865,19 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint16_t nn = bytes_to_16b(b1, b2);
                         jp(pc, nn);
                         t = 16;
-                        pc += 1;
                     }
                     break;
                 case 6:
                     // DI
+                    ime = false;
+                    t = 4;
+                    pc += 1;
                     break;
                 case 7:
                     // EI
+                    ime = true;
+                    t = 4;
+                    pc += 1;
                     break;
                 default:
                     break;
@@ -893,12 +892,10 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     case 0:
                         // CALL nz, nn
                         {
-                            bool z = *f >> 7;
-                            if (!z)
+                            if (!check_bit(7, *f))
                             {
                                 call(pc, *top, nn, sp);
                                 t = 24;
-                                pc += 1;
                             }
                             else 
                             {
@@ -910,12 +907,10 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     case 1:
                         // CALL z, nn
                         {
-                            bool z = *f >> 7;
-                            if (z)
+                            if (check_bit(7, *f))
                             {
                                 call(pc, *top, nn, sp);
                                 t = 24;
-                                pc += 1;
                             }
                             else 
                             {
@@ -927,12 +922,10 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     case 2:
                         // CALL nc, nn
                         {
-                            bool c = (*f >> 4) & 1;
-                            if (!c)
+                            if (!check_bit(4, *f))
                             {
                                 call(pc, *top, nn, sp);
                                 t = 24;
-                                pc += 1;
                             }
                             else 
                             {
@@ -944,12 +937,10 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                     case 3:
                         // CALL c, nn
                         {
-                            bool c = (*f >> 4) & 1;
-                            if (c)
+                            if (check_bit(4, *f))
                             {
                                 call(pc, *top, nn, sp);
                                 t = 24;
-                                pc += 1;
                             }
                             else 
                             {
@@ -983,7 +974,6 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint16_t nn = bytes_to_16b(b1, b2);
                         call(pc, *top, nn, sp);
                         t = 24;
-                        pc += 1;
                     }
                     break;
                 default:
@@ -1016,11 +1006,86 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
             break;
         }
     }
+
+#ifdef CMAKE_LOG_CPU_INSTRUCTIONS
+    std::cout << std::endl << std::hex << "--------CPU INSTRUCTION--------" << std::endl
+        << "bytes: " << (int)b3 << " " << (int)b2 << " " << (int)b1 << " " << (int)b0 << std::endl
+        << "cpu regs " << "af: " << af << ", bc: " << bc << ", de: " << de << ", hl: " << hl << ", sp: " << sp << std::endl
+        << "new pc: " << pc << std::endl
+        << "t value: " << t << std::endl
+        << "memory: ";
+#endif
+#ifdef CMAKE_LOG_MEMORY_8000_9FFF
+    for (uint16_t i = 0x8000; i <= 0x9FFF; i++)
+    {
+        std::cout << std::hex << "[" << (int)i << ":" << (int)Memory::registers[i] << "], ";
+    }
+#endif
+#ifdef CMAKE_LOG_MEMORY_FF00_FFFF
+    for (uint16_t i = 0xFF00; i < 0xFFFF; i++)
+    {
+        std::cout << std::hex << "[" << (int)i << ":" << (int)Memory::registers[i] << "], ";
+    }
+    std::cout << std::hex << "[" << (int)0xFFFF << ":" << (int)Memory::registers[0xFFFF] << "], ";
+#endif
+
 }
 
+void CPU::interrupt(const uint8_t &code)
+{
+    if (!ime)
+    {
+        return;
+    }
 
+    uint8_t *ie = &Memory::registers[0xFFFF];
+    // uint8_t *_if = Memory::get_8b(0xFF0F); not needed, `const uint16_t &code` implements
 
+    switch (code)
+    {
+    case VBLANK_INT:
+        if (!check_bit(0, *ie)) 
+        {
+            return;
+        }
+        break;
+    case STAT_INT:
+        if (!check_bit(1, *ie)) 
+        {
+            return;
+        }
+        break;
+    case TIMER_INT:
+        if (!check_bit(2, *ie)) 
+        {
+            return;
+        }
+        break;
+    case SERIAL_INT:
+        if (!check_bit(3, *ie)) 
+        {
+            return;
+        }
+        break;
+    case JOYPAD_INT:
+        if (!check_bit(4, *ie)) 
+        {
+            return;
+        }
+        break;
+    default:
+        break;
+    }
 
+    uint16_t *top = Memory::get_16b(sp);
+    push(*top, pc, sp);
+    pc = static_cast<uint16_t>(code);
+
+    ime = false;
+
+    // std::cout << std::hex << "Post-interrupt pc: " << (int)pc << ", lc: " << (int)Memory::registers[0xff44] << std::endl;
+    t += 20;
+}
 
 #ifdef CMAKE_BUILD_TESTING
 

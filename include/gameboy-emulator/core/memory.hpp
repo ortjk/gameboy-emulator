@@ -24,11 +24,21 @@ private:
     // FF80     FFFE     High RAM
     // FFFF     FFFF     Interrupt enable register
 
-    static uint8_t registers[65536];
-
 public:
-    static uint8_t *get_8b(const uint16_t &address);
+    static uint8_t registers[65536];
+    static uint8_t dmg[256];
+
     static uint16_t *get_16b(const uint16_t &address);
+
+    /**@brief Get pointer to memory explicitly from the _dmg array (ignore 0xFF50).
+     *
+     *@param address Address of byte to access
+     *
+     *@returns Byte in _dmg at address.
+     */
+    static uint8_t *get_8b_dmg(const uint8_t &address);
+
+    static void unmap_dmg();
 
 #ifdef CMAKE_BUILD_TESTING
     static void write(const uint8_t &b, const uint16_t &address);

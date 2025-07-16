@@ -17,42 +17,35 @@ uint16_t byte_to_16b(const uint8_t &b)
     return b;
 }
 
-void set_bit(int i, uint8_t &b)
+void set_bit(uint8_t i, uint8_t &b)
 {
-    if (i < 8)
-    {
-        uint8_t x = 1 << i;
-        b = b | x;
-    }
+    i = 1 << i;
+    b = b | i;
 }
 
-void set_bit(int i, uint16_t &b)
+void set_bit(uint16_t i, uint16_t &b)
 {
-    if (i < 16)
-    {
-        uint16_t x = 1 << i;
-        b = b | x;
-    }
+    i = 1 << i;
+    b = b | i;
 }
 
-void reset_bit(int i, uint8_t &b)
+void reset_bit(uint8_t i, uint8_t &b)
 {
-    if (i < 8)
-    {
-        uint8_t x = 1 << i;
-        x = ~x;
-        b = b & x;
-    }
+    i = 1 << i;
+    i = ~i;
+    b = b & i;
 }
 
-void reset_bit(int i, uint16_t &b)
+void reset_bit(uint16_t i, uint16_t &b)
 {
-    if (i < 16)
-    {
-        uint16_t x = 1 << i;
-        x = ~x;
-        b = b & x;
-    }
+    i = 1 << i;
+    i = ~i;
+    b = b & i;
+}
+
+bool check_bit(uint8_t i, const uint8_t &b)
+{
+    return (b >> i) & 1;
 }
 
 } // namespace emulator

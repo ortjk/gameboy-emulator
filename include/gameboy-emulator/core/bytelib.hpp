@@ -23,27 +23,29 @@ uint16_t byte_to_16b(const uint8_t &b);
  *@param i Index of bit
  *@param b Number to edit
  */
-void set_bit(int i, uint8_t &b);
+void set_bit(uint8_t i, uint8_t &b);
 
 /**@brief Set a bit within a 16-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
-void set_bit(int i, uint16_t &b);
+void set_bit(uint16_t i, uint16_t &b);
 
 /**@brief Reset a bit within an 8-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
-void reset_bit(int i, uint8_t &b);
+void reset_bit(uint8_t i, uint8_t &b);
 
 /**@brief Reset a bit within a 16-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
-void reset_bit(int i, uint16_t &b);
+void reset_bit(uint16_t i, uint16_t &b);
+
+bool check_bit(uint8_t i, const uint8_t &b);
 
 } // namespace emulator
