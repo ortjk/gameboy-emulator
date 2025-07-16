@@ -13,11 +13,12 @@ namespace emulator {
 class Window {
 private:
     static GLFWwindow *window;
+    static const GLFWvidmode *mode;
     static uint8_t pixels[160 * 144];
 
     static void init_window();
-
-    static void render();
+    static void blit();
+    static void game_loop();
     static void close();
 public:
     static void open();

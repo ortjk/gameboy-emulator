@@ -13,6 +13,13 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         add_subdirectory(tests)
     endif()
 
+    if (ENABLE_PROFILING)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+    endif()
+
     if (LOG_CPU_INSTRUCTIONS)
         set(CMAKE_LOG_CPU_INSTRUCTIONS ON)
         add_compile_definitions(CMAKE_LOG_CPU_INSTRUCTIONS)

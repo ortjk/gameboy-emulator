@@ -4,7 +4,7 @@
 
 #include "gameboy-emulator/core/alu.hpp"
 
-#define VBANK_INT 0x40
+#define VBLANK_INT 0x40
 #define STAT_INT 0x48
 #define TIMER_INT 0x50
 #define SERIAL_INT 0x58
@@ -29,7 +29,6 @@ private:
     static uint16_t sp; // stack pointer
     
     static bool ime; // interrupt master enable flag
-    static bool pre_ime; // pre-interrupt state of ime
 
     // 8-bit register table
     static uint8_t *r[8];
