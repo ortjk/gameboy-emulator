@@ -1,5 +1,8 @@
 #include "gameboy-emulator/core/motherboard.hpp"
 
+#include "gameboy-emulator/core/cpu.hpp"
+#include "gameboy-emulator/core/memory.hpp"
+
 #include <iostream>
 #include <fstream>
 

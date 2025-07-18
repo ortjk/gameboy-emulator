@@ -1,7 +1,9 @@
 #include "gameboy-emulator/graphics/window.hpp"
+
+#include "gameboy-emulator/graphics/gpu.hpp"
+#include "gameboy-emulator/core/motherboard.hpp"
 #include "gameboy-emulator/graphics/gpu.hpp"
 
-#include <GLFW/glfw3.h>
 #include <math.h>
 #include <chrono>
 #include <thread>

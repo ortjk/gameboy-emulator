@@ -1,7 +1,5 @@
 #include "gameboy-emulator/core/memory.hpp"
 
-#include <stdexcept>
-
 namespace emulator
 {
 

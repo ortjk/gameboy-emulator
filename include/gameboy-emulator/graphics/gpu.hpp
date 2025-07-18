@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "gameboy-emulator/core/cpu.hpp"
-
 #define PIXELS_TO_BG_TILE_MAP(x, y, scrx, scry) ( \
     (((x + scrx) % 256) / 8) + ((((y + scry) % 256) / 8) * 32) \
 )

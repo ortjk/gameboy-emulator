@@ -1,12 +1,8 @@
 #pragma once
 
 #include <cstdint>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "gameboy-emulator/graphics/gpu.hpp"
-#include "gameboy-emulator/core/motherboard.hpp"
 
 namespace emulator {
 

@@ -2,9 +2,6 @@
 
 #include <cstdint>
 
-#include "gameboy-emulator/core/cpu.hpp"
-#include "gameboy-emulator/core/memory.hpp"
-
 namespace emulator {
 
 class Motherboard {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-
 #include "gameboy-emulator/core/alu.hpp"
+
+#include <cstdint>
 
 #define VBLANK_INT 0x40
 #define STAT_INT 0x48

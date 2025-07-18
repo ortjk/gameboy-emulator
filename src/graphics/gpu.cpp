@@ -1,10 +1,10 @@
 #include "gameboy-emulator/graphics/gpu.hpp"
 
-#include <iostream>
-#include <sys/types.h>
-
+#include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/core/memory.hpp"
+
+#include <iostream>
 
 namespace emulator {
 
