@@ -2,7 +2,6 @@
 
 #include "gameboy-emulator/graphics/gpu.hpp"
 #include "gameboy-emulator/core/motherboard.hpp"
-#include "gameboy-emulator/graphics/gpu.hpp"
 
 #include <math.h>
 #include <chrono>
@@ -18,15 +17,12 @@ uint8_t Window::pixels[160 * 144] = {};
 void Window::init_window()
 {
     glfwInit();
-    // GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     glewInit();
     glOrtho(0, 160, 144, 0, 1, -1);
     glViewport(80, 72, 160, 144);
-
-    // mode = glfwGetVideoMode(monitor);
 }
 
 void Window::blit()
@@ -54,12 +50,12 @@ void Window::game_loop()
     const double refreshPeriod = 1. / 60.; // mode->refreshRate;
 
     const uint32_t cycles_per_frame = 70224;
-    uint32_t cycles_delta = 0;
+    uint32_t cycles_delta = 0; // cpu cycles since frame start
     
-    uint32_t dots_delta = 0;
-    uint16_t gpu_delay = 0;
+    uint32_t dots_delta = 0; // position in render cycle
+    uint16_t gpu_delay = 0; // delay resulting from gpu operation
 
-    uint8_t line = 0;
+    uint8_t line = 0; // current line in display
     uint8_t w = 0; // pixel fifo position
     while (!glfwWindowShouldClose(window))
     {
@@ -71,39 +67,7 @@ void Window::game_loop()
 
             if (gpu_delay == 0)
             {
-                if (line < 144)
-                {
-                    uint32_t dots = dots_delta % 456;
-                    if (dots == 0) // oam scan
-                    {
-                        GPU::scan_oam(line);
-                        dots_delta += 80;
-                        gpu_delay = 76;
-                    }
-                    else if (dots < 240) // drawing pixels
-                    {
-                        GPU::advance_fifo(pixels, w, line);
-                        w += 8;
-                        dots_delta += 8;
-                        gpu_delay += 4;
-                    }
-                    else // horizontal blank
-                    {
-                        GPU::hblank(line);
-                        line += 1;
-                        w = 0;
-
-                        dots_delta += 216;
-                        gpu_delay += 212;
-                    }
-                }
-                else  // vertical blank
-                {
-                    GPU::vblank(line);
-                    dots_delta += 456;
-                    gpu_delay += 452;
-                    line += 1;
-                }
+                Motherboard::gpu_process(pixels, dots_delta, gpu_delay);
             }
             else 
             {
@@ -115,7 +79,6 @@ void Window::game_loop()
 
         cycles_delta = 0;
         dots_delta = 0;
-        line = 0;
         
         int time_to_next = (int)((refreshPeriod - glfwGetTime() + frame_start) * 1000.);
         std::this_thread::sleep_for(std::chrono::milliseconds(time_to_next));

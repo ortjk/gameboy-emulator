@@ -2,17 +2,15 @@
 
 #include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/memory.hpp"
+#include "gameboy-emulator/graphics/gpu.hpp"
 
 #include <iostream>
 #include <fstream>
 
 namespace emulator {
 
-void Motherboard::bootrom_emu()
-{
-    CPU::instruction(0x31, 0xfe, 0xff, 0x00); // load sp
-    CPU::pc = 0x0100; // set pc
-}
+uint8_t Motherboard::line = 0;
+uint8_t Motherboard::w = 0;
 
 void Motherboard::read_rom(uint32_t &cycles_delta)
 {
@@ -55,33 +53,52 @@ void Motherboard::load_rom(const char *boot_path, const char *rom_path)
         std::cout << "error opening boot or rom at paths: " << boot_path << ", " << rom_path << std::endl;
     }
 }
-/*
-void Motherboard::load_rom(const char *rom_path)
-{
-    // open binary file input stream with position at eof
-    std::ifstream rom(rom_path, std::ios::in|std::ios::binary|std::ios::ate);
-    if (rom.is_open())
-    {
-        std::streampos rom_size = rom.tellg();
-        pm = new uint8_t[rom_size];
-
-        rom.seekg(0, std::ios::beg);
-        rom.read(reinterpret_cast<char *>(&pm[0]), rom_size);
-
-        rom.close();
-
-        bootrom_emu();
-    }
-    else 
-    {
-        std::cout << "error opening rom at path: " << rom_path << std::endl;
-    }
-}
-*/
 
 void Motherboard::close_rom()
 {
 
+}
+
+void Motherboard::gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &gpu_delay)
+{
+    if (line < 144)
+    {
+        uint32_t dots = dots_delta % 456;
+        if (dots == 0) // oam scan
+        {
+            GPU::scan_oam(line);
+            dots_delta += 80;
+            gpu_delay = 76;
+        }
+        else if (dots < 240) // drawing pixels
+        {
+            GPU::advance_fifo(pixels, w, line);
+            w += 8;
+            dots_delta += 8;
+            gpu_delay += 4;
+        }
+        else // horizontal blank
+        {
+            GPU::hblank(line);
+            line += 1;
+            w = 0;
+
+            dots_delta += 216;
+            gpu_delay += 212;
+        }
+    }
+    else  // vertical blank
+    {
+        GPU::vblank(line);
+        dots_delta += 456;
+        gpu_delay += 452;
+        line += 1;
+
+        if (line == 154)
+        {
+            line = 0;
+        }
+    }
 }
 
 } // namespace emulator

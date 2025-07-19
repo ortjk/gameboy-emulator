@@ -61,115 +61,144 @@ public:
     static uint16_t t;
     static uint16_t pc; // program counter
 
-    /**@brief Emulate a GameBoy Z80 instruction.
+    /**
+     *@brief Emulate a GameBoy Z80 instruction.
      *
-     * @param b3 First byte of instruction
-     * @param b2 Second byte of instruction
-     * @param b1 Third byte of instruction
-     * @param b0 Fourth byte of instruction
+     *@param b3 First byte of instruction
+     *@param b2 Second byte of instruction
+     *@param b1 Third byte of instruction
+     *@param b0 Fourth byte of instruction
      */
     static void instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, const uint8_t &b0);
 
+    /**
+     *@brief Handle an interrupt being called
+     *
+     * Checks if interrupts are enabled for the passed code, and if so, moves the program counter
+     * to the corresponding address.
+     *
+     *@param code interrupt code (memory address of interrupt handler)
+     */
     static void interrupt(const uint8_t &code);
 
 #ifdef CMAKE_BUILD_TESTING
-    /**@brief Helper function for testing to directly set a
+    /**
+     *@brief Helper function for testing to directly set a
      *
      *@param z Byte to load
      */
     static void set_a(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set b
+    /**
+     *@brief Helper function for testing to directly set b
      *
      *@param z Byte to load
      */
     static void set_b(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set c
+    /**
+     *@brief Helper function for testing to directly set c
      *
      *@param z Byte to load
      */
     static void set_c(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set d
+    /**
+     *@brief Helper function for testing to directly set d
      *
      *@param z Byte to load
      */
     static void set_d(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set e
+    /**
+     *@brief Helper function for testing to directly set e
      *
      *@param z Byte to load
      */
     static void set_e(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set f
+    /**
+     *@brief Helper function for testing to directly set f
      *
      *@param z Byte to load
      */
     static void set_f(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set h
+    /**
+     *@brief Helper function for testing to directly set h
      *
      *@param z Byte to load
      */
     static void set_h(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set l
+    /**
+     *@brief Helper function for testing to directly set l
      *
      *@param z Byte to load
      */
     static void set_l(const uint8_t &z);
 
-    /**@brief Helper function for testing to directly set pc
+    /**
+     *@brief Helper function for testing to directly set pc
      *
      *@param z Byte to load
      */
     static void set_pc(const uint16_t &z);
 
-    /**@brief Helper function for testing to directly set sp
+    /**
+     *@brief Helper function for testing to directly set sp
      *
      *@param z Byte to load
      */
     static void set_sp(const uint16_t &z);
 
-    /**@brief Helper function for testing to directly get a
+    /**
+     *@brief Helper function for testing to directly get a
      */
     static uint8_t get_a();
 
-    /**@brief Helper function for testing to directly get b
+    /**
+     *@brief Helper function for testing to directly get b
      */
     static uint8_t get_b();
 
-    /**@brief Helper function for testing to directly get c
+    /**
+     *@brief Helper function for testing to directly get c
      */
     static uint8_t get_c();
 
-    /**@brief Helper function for testing to directly get d
+    /**
+     *@brief Helper function for testing to directly get d
      */
     static uint8_t get_d();
 
-    /**@brief Helper function for testing to directly get e
+    /**
+     *@brief Helper function for testing to directly get e
      */
     static uint8_t get_e();
 
-    /**@brief Helper function for testing to directly get f
+    /**
+     *@brief Helper function for testing to directly get f
      */
     static uint8_t get_f();
 
-    /**@brief Helper function for testing to directly get h
+    /**
+     *@brief Helper function for testing to directly get h
      */
     static uint8_t get_h();
 
-    /**@brief Helper function for testing to directly get l
+    /**
+     *@brief Helper function for testing to directly get l
      */
     static uint8_t get_l();
 
-    /**@brief Helper function for testing to directly get pc
+    /**
+     *@brief Helper function for testing to directly get pc
      */
     static uint16_t get_pc();
 
-    /**@brief Helper function for testing to directly get sp
+    /**
+     *@brief Helper function for testing to directly get sp
      */
     static uint16_t get_sp();
 #endif

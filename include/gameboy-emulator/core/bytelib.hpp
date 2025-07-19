@@ -5,47 +5,59 @@
 namespace emulator
 {
 
-/**@brief Convert two bytes into one 16-bit number.
+/**
+ *@brief Convert two bytes into one 16-bit number.
  *
  *@param msB Most significant byte
  *@param lsB Least significant byte
  */
 uint16_t bytes_to_16b(const uint8_t &msB, const uint8_t &lsB);
 
-/**@brief Convert a two's complement 8-bit number into a two's complement 16-bit number.
+/**
+ *@brief Convert a two's complement 8-bit number into a two's complement 16-bit number.
  *
  *@param b Byte to convert
  */
 uint16_t byte_to_16b(const uint8_t &b);
 
-/**@brief Set a bit within an 8-bit number.
+/**
+ *@brief Set a bit within an 8-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
 void set_bit(uint8_t i, uint8_t &b);
 
-/**@brief Set a bit within a 16-bit number.
+/**
+ *@brief Set a bit within a 16-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
 void set_bit(uint16_t i, uint16_t &b);
 
-/**@brief Reset a bit within an 8-bit number.
+/**
+ *@brief Reset a bit within an 8-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
 void reset_bit(uint8_t i, uint8_t &b);
 
-/**@brief Reset a bit within a 16-bit number.
+/**
+ *@brief Reset a bit within a 16-bit number.
  *
  *@param i Index of bit
  *@param b Number to edit
  */
 void reset_bit(uint16_t i, uint16_t &b);
 
+/**
+ *@brief Return true if bit i in byte b is set
+ *
+ *@param i bit index
+ *@param b byte to check
+ */
 bool check_bit(uint8_t i, const uint8_t &b);
 
 } // namespace emulator
