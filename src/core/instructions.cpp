@@ -63,13 +63,13 @@ void push(uint16_t &top, const uint16_t &val, uint16_t &sp)
 
 void call(uint16_t &pc, uint16_t &top, const uint16_t &val, uint16_t &sp)
 {
-    push(top, pc+2, sp); // +2 and not +3 because ret instruction increments pc by +1
+    push(top, pc+3, sp);
     pc = val;
 }
 
-void rst(uint16_t &pc, const uint8_t &val, uint16_t &top, uint16_t &sp)
+void rst(uint16_t &pc, uint16_t &top, const uint8_t &val, uint16_t &sp)
 {
-    push(top, pc, sp);
+    push(top, pc+1, sp);
     pc = val;
 }
 

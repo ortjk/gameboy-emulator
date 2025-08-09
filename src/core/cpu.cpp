@@ -5,6 +5,7 @@
 #include "gameboy-emulator/core/memory.hpp"
 
 #include <iostream>
+#include <iomanip>
 
 namespace emulator {
 
@@ -590,8 +591,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         else
                         {
                             t = 8;
+                            pc += 1;
                         }
-                        pc += 1;
                     }
                     break;
                 case 1:
@@ -606,8 +607,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         else
                         {
                             t = 8;
+                            pc += 1;
                         }
-                        pc += 1;
                     }
                     break;
                 case 2:
@@ -622,8 +623,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         else
                         {
                             t = 8;
+                            pc += 1;
                         }
-                        pc += 1;
                     }
                     break;
                 case 3:
@@ -638,8 +639,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         else
                         {
                             t = 8;
+                            pc += 1;
                         }
-                        pc += 1;
                     }
                     break;
                 case 4:
@@ -670,6 +671,11 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint8_t *a = reinterpret_cast<uint8_t *>(&af)+1;
                         uint8_t *reg = &Memory::registers[0xFF00 + static_cast<uint16_t>(b2)];
                         ld(*a, *reg);
+                        
+                        #ifdef CMAKE_LOG_CPU_INSTRUCTIONS
+                        if (b2 == 0x44) { ld(*a, 0x90); } // needed for gameboy doctor test
+                        #endif
+
                         t = 12;
                         pc += 2;
                     }
@@ -711,7 +717,6 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                             uint16_t *top = Memory::get_16b(sp);
                             ret(pc, *top, sp);
                             t = 16;
-                            pc += 1;
                         }
                         break;
                     case 1:
@@ -993,9 +998,8 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                 // RST y*8
                 {
                     uint16_t *top = Memory::get_16b(sp);
-                    rst(pc, ocv.y * 8, *top, sp);
+                    rst(pc, *top, ocv.y * 8, sp);
                     t = 16;
-                    pc += 1;
                 }
                 break;
             default:
@@ -1008,12 +1012,28 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
     }
 
 #ifdef CMAKE_LOG_CPU_INSTRUCTIONS
-    std::cout << std::endl << std::hex << "--------CPU INSTRUCTION--------" << std::endl
-        << "bytes: " << (int)b3 << " " << (int)b2 << " " << (int)b1 << " " << (int)b0 << std::endl
-        << "cpu regs " << "af: " << af << ", bc: " << bc << ", de: " << de << ", hl: " << hl << ", sp: " << sp << std::endl
-        << "new pc: " << pc << std::endl
-        << "t value: " << t << std::endl
-        << "memory: ";
+    // std::cout << std::endl << std::hex << "--------CPU INSTRUCTION--------" << std::endl
+    //     << "bytes: " << (int)b3 << " " << (int)b2 << " " << (int)b1 << " " << (int)b0 << std::endl
+    //     << "cpu regs " << "af: " << af << ", bc: " << bc << ", de: " << de << ", hl: " << hl << ", sp: " << sp << std::endl
+    //     << "new pc: " << pc << std::endl
+    //     << "t value: " << t << std::endl
+    //     << "memory: ";
+
+    if (pc >= 0x100)
+    {
+        std::cout << std::hex << std::uppercase << std::setfill('0')
+            << "A:" << std::setw(2) << (int)(af >> 8) << " F:" << std::setw(2) << (int)(af & 0xFF)
+            << " B:" << std::setw(2) << (int)(bc >> 8) << " C:" << std::setw(2) << (int)(bc & 0xFF) 
+            << " D:" << std::setw(2) << (int)(de >> 8) << " E:" << std::setw(2) << (int)(de & 0xFF)
+            << " H:" << std::setw(2) << (int)(hl >> 8) << " L:" << std::setw(2) << (int)(hl & 0xFF)
+            << " SP:" << std::setw(4) << (int)sp 
+            << " PC:" << std::setw(4) << (int)pc
+            << " PCMEM:" << std::setw(2) << (int)Memory::registers[pc] << ","
+            << std::setw(2) << (int)Memory::registers[pc+1] << ","
+            << std::setw(2) << (int)Memory::registers[pc+2] << ","
+            << std::setw(2) << (int)Memory::registers[pc+3]
+            << std::endl;
+    }
 #endif
 #ifdef CMAKE_LOG_MEMORY_8000_9FFF
     for (uint16_t i = 0x8000; i <= 0x9FFF; i++)
