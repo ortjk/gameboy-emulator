@@ -18,6 +18,7 @@ uint16_t CPU::hl = 0x0000;
 uint16_t CPU::sp = 0x0000;
 
 bool CPU::ime = false;
+bool CPU::halt = false;
 
 uint8_t *CPU::r[8] = {
     reinterpret_cast<uint8_t *>(&bc)+1, reinterpret_cast<uint8_t *>(&bc), 
@@ -40,6 +41,14 @@ alu::alu_8b_f CPU::al[8] = {
 
 alu::rot_8b_f CPU::rot[8] = {
     alu::rlc, alu::rrc, alu::rl, alu::rr, alu::sla, alu::sra, alu::swap, alu::srl
+};
+
+const uint16_t CPU::int_addrs[5] = {
+    VBLANK_INT,
+    STAT_INT,
+    TIMER_INT,
+    SERIAL_INT,
+    JOYPAD_INT
 };
 
 void CPU::adda(uint8_t &_, const uint8_t &b, uint8_t &flags) { uint8_t *a = reinterpret_cast<uint8_t *>(&af)+1; alu::add(*a, b, flags); }
@@ -516,7 +525,7 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
             if (ocv.z == 6 && ocv.y == 6)
             {
                 // HALT
-                // TODO wait until interrupt
+                halt = true;
                 t = 4;
             }
             else 
@@ -1053,55 +1062,50 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
 
 }
 
-void CPU::interrupt(const uint8_t &code)
+void CPU::interrupt()
 {
-    if (!ime)
+    if (!ime && !halt)
     {
         return;
     }
 
     uint8_t *ie = &Memory::registers[0xFFFF];
-    // uint8_t *_if = Memory::get_8b(0xFF0F); not needed, `const uint16_t &code` implements
+    uint8_t *_if = &Memory::registers[0xFF0F];
+    uint16_t code = 0;
 
-    switch (code)
+    // handle interrupts in order of priority
+    for (uint8_t i = 0; i < 5; i++)
     {
-    case VBLANK_INT:
-        if (!check_bit(0, *ie)) 
+        if (check_bit(i, *ie) && check_bit(i, *_if))
+        {
+            code = int_addrs[i];
+            if (ime) // check needed for halt logic
+            {
+                reset_bit(i, *_if);
+            }
+            break;
+        }
+    }
+
+    // check if any interrupt was found
+    if (code == 0)
+    {
+        return;
+    }
+
+    if (halt)
+    {
+        halt = false;
+        pc++;
+        if (!ime)
         {
             return;
         }
-        break;
-    case STAT_INT:
-        if (!check_bit(1, *ie)) 
-        {
-            return;
-        }
-        break;
-    case TIMER_INT:
-        if (!check_bit(2, *ie)) 
-        {
-            return;
-        }
-        break;
-    case SERIAL_INT:
-        if (!check_bit(3, *ie)) 
-        {
-            return;
-        }
-        break;
-    case JOYPAD_INT:
-        if (!check_bit(4, *ie)) 
-        {
-            return;
-        }
-        break;
-    default:
-        break;
     }
 
     uint16_t *top = Memory::get_16b(sp);
     push(*top, pc, sp);
-    pc = static_cast<uint16_t>(code);
+    pc = code;
 
     ime = false;
 

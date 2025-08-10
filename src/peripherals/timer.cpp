@@ -1,7 +1,6 @@
 #include "gameboy-emulator/peripherals/timer.hpp"
 
 #include "gameboy-emulator/core/bytelib.hpp"
-#include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 
 namespace emulator {
@@ -11,12 +10,13 @@ const uint8_t *Timer::tac = &Memory::registers[0xff07];
 
 uint8_t *Timer::div = &Memory::registers[0xff04];
 uint8_t *Timer::tima = &Memory::registers[0xff05];
+uint8_t *Timer::_if = &Memory::registers[0xff0f];
 
 const uint8_t Timer::clk_sel[4] = {
-    64, // 256 M-cycles
-    1,  // 4 M-cycles
-    4,  // 16 M-cycles
-    16  // 64 M-cycles
+    255, // 256 M-cycles
+    3,  // 4 M-cycles
+    15,  // 16 M-cycles
+    63  // 64 M-cycles
 };
 
 uint8_t Timer::div_d = 0;
@@ -24,7 +24,7 @@ uint8_t Timer::tima_d = 0;
 
 void Timer::increment_div()
 {
-    if (++div_d >= 16) // check clock divider
+    if (++div_d >= 63) // check clock divider
     {
         div_d = 0;
         (*div)++;
@@ -49,8 +49,8 @@ void Timer::increment_tima()
         // set tima to tma
         *tima = *tma;
 
-        // request interrupt
-        CPU::interrupt(TIMER_INT);
+        // request timer interrupt
+        set_bit(2, *_if); 
     }
     else // no overflow will occur 
     {

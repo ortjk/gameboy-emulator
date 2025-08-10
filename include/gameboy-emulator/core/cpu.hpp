@@ -29,6 +29,7 @@ private:
     static uint16_t sp; // stack pointer
     
     static bool ime; // interrupt master enable flag
+    static bool halt; // whether or not the cpu is HALT-ed
 
     // 8-bit register table
     static uint8_t *r[8];
@@ -44,6 +45,9 @@ private:
 
     // rotation/shift operations
     static alu::rot_8b_f rot[8];
+
+    // interrupt callback addresses
+    static const uint16_t int_addrs[5];
 
     // wrapper functions for alu functions on a
     static void adda(uint8_t &_, const uint8_t &b, uint8_t &flags);
@@ -72,14 +76,12 @@ public:
     static void instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, const uint8_t &b0);
 
     /**
-     *@brief Handle an interrupt being called
+     *@brief Handle interrupts being called
      *
-     * Checks if interrupts are enabled for the passed code, and if so, moves the program counter
+     * Checks if any interrupt flags are set, and if so, moves the program counter
      * to the corresponding address.
-     *
-     *@param code interrupt code (memory address of interrupt handler)
      */
-    static void interrupt(const uint8_t &code);
+    static void interrupt();
 
 #ifdef CMAKE_BUILD_TESTING
     /**

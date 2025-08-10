@@ -17,6 +17,8 @@ private:
     static uint8_t *div;
     // timer counter
     static uint8_t *tima;
+    // interrupt flags
+    static uint8_t *_if;
 
     static const uint8_t clk_sel[4];
 

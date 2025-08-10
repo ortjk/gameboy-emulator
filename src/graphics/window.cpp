@@ -178,6 +178,8 @@ void Window::game_loop()
             {
                 gpu_delay -= 4;
             }
+
+            Motherboard::handle_interrupts();
         }
 
         blit();

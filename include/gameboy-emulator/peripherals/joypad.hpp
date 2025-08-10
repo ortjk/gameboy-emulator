@@ -8,6 +8,8 @@ class Joypad {
 private:
     // joypad register
     static uint8_t *joyp;
+    // interrupt flags
+    static uint8_t *_if;
 public:
     /**
      *@brief Update joypad registers

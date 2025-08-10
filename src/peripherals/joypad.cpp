@@ -1,11 +1,12 @@
 #include "gameboy-emulator/peripherals/joypad.hpp"
 
-#include "gameboy-emulator/core/cpu.hpp"
+#include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 
 namespace emulator {
 
 uint8_t *Joypad::joyp = &Memory::registers[0xff00];
+uint8_t *Joypad::_if = &Memory::registers[0xff0f];
 
 void Joypad::tick(const uint8_t &buttons, const bool &joypad_int)
 {
@@ -30,7 +31,8 @@ void Joypad::tick(const uint8_t &buttons, const bool &joypad_int)
 
     if (joypad_int)
     {
-        CPU::interrupt(JOYPAD_INT);
+        // request joypad interrupt
+        set_bit(4, *_if);
     }
 }
 

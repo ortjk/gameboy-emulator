@@ -111,4 +111,9 @@ void Motherboard::peripheral_tick(const uint8_t &buttons, const bool &joypad_int
     Timer::tick();
 }
 
+void Motherboard::handle_interrupts()
+{
+    CPU::interrupt();
+}
+
 } // namespace emulator
