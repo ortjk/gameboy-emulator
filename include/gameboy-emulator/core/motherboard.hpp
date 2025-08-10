@@ -46,6 +46,18 @@ public:
      *@param gpu_delay delay resulting from gpu operation
      */
     static void gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &gpu_delay);
+
+    /**
+     *@brief Update the statuses of all peripherals
+     *
+     * Effectively, pass 4 M-cycles for all peripherals (joypad, serial, timer)
+     */
+    static void peripheral_tick(const uint8_t &buttons, const bool &joypad_int);
+
+    /**
+     *@brief Allow the CPU to handle incoming interrupts
+     */
+    static void handle_interrupts();
 };
 
 } // namespace emulator

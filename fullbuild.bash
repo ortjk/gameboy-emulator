@@ -1,5 +1,5 @@
 rm -rf ./build/*
-cmake -S . -B build -G Ninja \
+cmake -S . -B build -G Ninja --graphviz=./build/graph/foo.dot \
     -D CMAKE_EXPORT_COMPILE_COMMANDS=1 \
     -D CMAKE_C_COMPILER=clang \
     -D CMAKE_CXX_COMPILER=clang++ \

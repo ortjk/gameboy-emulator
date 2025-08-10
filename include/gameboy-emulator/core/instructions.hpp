@@ -98,10 +98,10 @@ void call(uint16_t &pc, uint16_t &top, const uint16_t &val, uint16_t &sp);
  *@brief Push the current pc value plus 1 onto the stack, then load it with a number.
  *
  *@param pc Reference to the program counter
- *@param val New value to load into pc
  *@param top Reference to the top of the stack
+ *@param val New value to load into pc
  *@param sp Reference to the stack pointer
  */
-void rst(uint16_t &pc, const uint8_t &val, uint16_t &top, uint16_t &sp);
+void rst(uint16_t &pc, uint16_t &top, const uint8_t &val, uint16_t &sp);
 
 } // namespace emulator

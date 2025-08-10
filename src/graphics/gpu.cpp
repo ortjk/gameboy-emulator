@@ -1,6 +1,5 @@
 #include "gameboy-emulator/graphics/gpu.hpp"
 
-#include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 
@@ -26,6 +25,7 @@ const uint8_t *GPU::obp = &Memory::registers[0xff48];
 const uint8_t *GPU::wy = &Memory::registers[0xff4a];
 const uint8_t *GPU::wx = &Memory::registers[0xff4b];
 
+uint8_t *GPU::_if = &Memory::registers[0xff0f];
 uint8_t *GPU::stat = &Memory::registers[0xff41];
 uint8_t *GPU::ly = &Memory::registers[0xff44];
 
@@ -41,7 +41,8 @@ void GPU::set_mode(const uint8_t &mode)
     *stat = (*stat & 0xFC) | mode; // set stat mode
     if (mode != 3 && check_bit(3 + mode, *stat))
     {
-        CPU::interrupt(STAT_INT);
+        // request stat interrupt
+        set_bit(1, *_if);
     }
 }
 
@@ -185,7 +186,8 @@ void GPU::scan_oam(const uint8_t &y)
     if (*ly == *lyc && check_bit(6, *stat)) 
     { 
         set_bit(2, *stat); 
-        CPU::interrupt(STAT_INT); 
+        // request stat interrupt
+        set_bit(1, *_if);
     }
 
     // reset oam scan
@@ -268,13 +270,15 @@ void GPU::vblank(const uint8_t &y)
     if (*ly == *lyc && check_bit(6, *stat))
     {
         set_bit(2, *stat); 
-        CPU::interrupt(STAT_INT); 
+        // request stat interrupt
+        set_bit(1, *_if);
     }
     if (y == 144)
     {
         wy_i = 0; // reset internal window line counter
         set_mode(1); // set vertical blank mode
-        CPU::interrupt(VBLANK_INT);
+        // request vblank interrupt
+        set_bit(0, *_if);
     }
 }
 

@@ -49,6 +49,8 @@ private:
     static const uint8_t *wx;
 
     /* MODIFIABLE REGISTERS */
+    // interrupt flags
+    static uint8_t *_if;
     // gpu status
     static uint8_t *stat;
     // current line

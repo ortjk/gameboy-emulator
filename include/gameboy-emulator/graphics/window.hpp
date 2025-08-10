@@ -12,12 +12,18 @@ private:
     static const GLFWvidmode *mode;
     static uint8_t pixels[160 * 144];
 
+    static bool key_update;
+
     /**
      *@brief Create and configure the main emulator window
      *
      * Calls glfw functions to create window and context, and configures OpenGL viewport/orthographic view.
      */
     static void init_window();
+
+    static void on_key_press(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+    static void update_keys(uint8_t &buttons, bool &joypad_int);
 
     /**
      *@brief Clear the existing window and draw pixels from buffer
