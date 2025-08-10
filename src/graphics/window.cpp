@@ -7,13 +7,13 @@
 #include <math.h>
 #include <chrono>
 #include <thread>
-#include <iostream>
 
 namespace emulator {
 
 GLFWwindow *Window::window = nullptr;
 const GLFWvidmode *Window::mode = nullptr;
 uint8_t Window::pixels[160 * 144] = {};
+bool Window::key_update = false;
 
 void Window::init_window()
 {
