@@ -4,6 +4,7 @@
 #include "gameboy-emulator/core/memory.hpp"
 #include "gameboy-emulator/graphics/gpu.hpp"
 #include "gameboy-emulator/peripherals/timer.hpp"
+#include "gameboy-emulator/peripherals/joypad.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -102,8 +103,9 @@ void Motherboard::gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &g
     }
 }
 
-void Motherboard::peripheral_tick()
+void Motherboard::peripheral_tick(const uint8_t &buttons, const bool &joypad_int)
 {
+    Joypad::tick(buttons, joypad_int);
     Timer::tick();
 }
 

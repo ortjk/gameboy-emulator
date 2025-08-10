@@ -39,7 +39,7 @@ private:
     static void increment_tima();
 public:
     /**
-     *@brief Updated timer registers
+     *@brief Update timer registers
      */
     static void tick();
 };

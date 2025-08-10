@@ -52,7 +52,7 @@ public:
      *
      * Effectively, pass 4 M-cycles for all peripherals (joypad, serial, timer)
      */
-    static void peripheral_tick();
+    static void peripheral_tick(const uint8_t &buttons, const bool &joypad_int);
 };
 
 } // namespace emulator
