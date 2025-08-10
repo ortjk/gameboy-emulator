@@ -4,8 +4,10 @@
 #include "gameboy-emulator/core/instructions.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 
+#ifdef CMAKE_LOG_CPU_INSTRUCTIONS
 #include <iostream>
 #include <iomanip>
+#endif
 
 namespace emulator {
 

@@ -3,6 +3,7 @@
 #include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 #include "gameboy-emulator/graphics/gpu.hpp"
+#include "gameboy-emulator/peripherals/timer.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -99,6 +100,11 @@ void Motherboard::gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &g
             line = 0;
         }
     }
+}
+
+void Motherboard::peripheral_tick()
+{
+    Timer::tick();
 }
 
 } // namespace emulator

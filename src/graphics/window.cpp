@@ -73,6 +73,8 @@ void Window::game_loop()
             {
                 gpu_delay -= 4;
             }
+
+            Motherboard::peripheral_tick();
         }
 
         blit();
