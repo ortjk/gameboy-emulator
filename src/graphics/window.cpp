@@ -1,10 +1,11 @@
 #include "gameboy-emulator/graphics/window.hpp"
 
+#include "gameboy-emulator/graphics/gui.hpp"
 #include "gameboy-emulator/core/motherboard.hpp"
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/graphics/screen.hpp"
 
-#include <GLFW/glfw3.h>
+#include <cstddef>
 #include <math.h>
 #include <chrono>
 #include <thread>
@@ -17,14 +18,18 @@ bool Window::key_update = false;
 
 void Window::init_window()
 {
+    // initialize glfw
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
-
     glfwSetKeyCallback(window, on_key_press);
 
+    // initialize imgui
+    GUI::init(window);
+
+    // initialize glew/opengl
     glewInit();
     glOrtho(0, 160, 144, 0, 1, -1);
     const uint8_t scale = 8;
@@ -148,9 +153,14 @@ void Window::game_loop()
     uint8_t w = 0; // pixel fifo position
 
     uint8_t buttons = 0xFF; // byte that contains the input keys
+
     while (!glfwWindowShouldClose(window))
     {
         double frame_start = glfwGetTime();
+
+        glfwPollEvents();
+
+        GUI::draw();
 
         while (cycles_delta < cycles_per_frame)
         {
@@ -178,20 +188,21 @@ void Window::game_loop()
         }
 
         blit();
+        GUI::render();
+
+        glfwSwapBuffers(window);
 
         cycles_delta = 0;
         dots_delta = 0;
         
         int time_to_next = (int)((refreshPeriod - glfwGetTime() + frame_start) * 1000.);
         std::this_thread::sleep_for(std::chrono::milliseconds(time_to_next));
-
-
-        glfwPollEvents();
     }
 }
 
 void Window::close()
 {
+    GUI::close();
     glfwDestroyWindow(window);
     glfwTerminate();
 }
