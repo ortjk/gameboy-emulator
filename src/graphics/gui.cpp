@@ -15,7 +15,7 @@ void GUI::memory_viewer()
     ImGui::Begin("Memory", NULL, ImGuiWindowFlags_NoScrollbar);
 
     ImGui::Text("        00 01 02 03  04 05 06 07  08 09 0a 0b  0c 0d 0e 0f");
-    
+
     ImGui::BeginChild("Memory.Scroll");
     for (int i = 0; i < 0xFFFF; i += 16)
     {
@@ -33,7 +33,9 @@ void GUI::memory_viewer()
 
 void GUI::object_viewer()
 {
+    ImGui::Begin("Objects");
 
+    ImGui::End();
 }
 
 void GUI::init(GLFWwindow *window)
@@ -45,7 +47,7 @@ void GUI::init(GLFWwindow *window)
     // io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 void GUI::draw()
@@ -54,6 +56,7 @@ void GUI::draw()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     memory_viewer();
+    object_viewer();
 }
 
 void GUI::render()
