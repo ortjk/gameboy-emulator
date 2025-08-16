@@ -2,6 +2,7 @@
 
 #include "gameboy-emulator/core/motherboard.hpp"
 #include "gameboy-emulator/core/bytelib.hpp"
+#include "gameboy-emulator/graphics/screen.hpp"
 
 #include <GLFW/glfw3.h>
 #include <math.h>
@@ -12,12 +13,13 @@ namespace emulator {
 
 GLFWwindow *Window::window = nullptr;
 const GLFWvidmode *Window::mode = nullptr;
-uint8_t Window::pixels[160 * 144] = {};
 bool Window::key_update = false;
 
 void Window::init_window()
 {
     glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
 
@@ -25,7 +27,10 @@ void Window::init_window()
 
     glewInit();
     glOrtho(0, 160, 144, 0, 1, -1);
-    glViewport(80, 72, 160, 144);
+    const uint8_t scale = 8;
+    glViewport(0, 0, 160 * scale, 144 * scale);
+
+    Screen::init();
 }
 
 void Window::on_key_press(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -121,20 +126,10 @@ void Window::update_keys(uint8_t &buttons, bool &joypad_int)
 
 void Window::blit()
 {
-    glClearColor(0.00f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBegin(GL_POINTS);
-        for (int y = 0; y < 144; y++)
-        {
-            for (int x = 0; x < 160; x++)
-            {
-                uint8_t color = pixels[x + (y * 160)];
-                glColor3f(0.f, color / 3.f, 0.f);
-                glVertex3f((float)x, (float)y, 0.0f);
-            }
-        }
-    glEnd();
+    Screen::render();
 
     glfwSwapBuffers(window);
 }
@@ -172,7 +167,7 @@ void Window::game_loop()
 
             if (gpu_delay == 0)
             {
-                Motherboard::gpu_process(pixels, dots_delta, gpu_delay);
+                Motherboard::gpu_process(Screen::pixels, dots_delta, gpu_delay);
             }
             else 
             {
