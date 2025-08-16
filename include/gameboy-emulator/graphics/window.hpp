@@ -10,7 +10,6 @@ class Window {
 private:
     static GLFWwindow *window;
     static const GLFWvidmode *mode;
-    static uint8_t pixels[160 * 144];
 
     static bool key_update;
 
