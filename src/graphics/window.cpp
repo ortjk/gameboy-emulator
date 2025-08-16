@@ -18,6 +18,8 @@ bool Window::key_update = false;
 void Window::init_window()
 {
     glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
 
@@ -25,7 +27,10 @@ void Window::init_window()
 
     glewInit();
     glOrtho(0, 160, 144, 0, 1, -1);
-    glViewport(80, 72, 160, 144);
+    const uint8_t scale = 8;
+    glViewport(0, 0, 160 * scale, 144 * scale);
+
+    Screen::init();
 }
 
 void Window::on_key_press(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -121,7 +126,7 @@ void Window::update_keys(uint8_t &buttons, bool &joypad_int)
 
 void Window::blit()
 {
-    glClearColor(0.00f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     Screen::render();
