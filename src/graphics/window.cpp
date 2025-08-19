@@ -22,7 +22,7 @@ void Window::init_window()
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, on_key_press);
 
@@ -31,9 +31,9 @@ void Window::init_window()
 
     // initialize glew/opengl
     glewInit();
-    glOrtho(0, 160, 144, 0, 1, -1);
+    glOrtho(-80, 80, 72, -72, 1, -1);
     const uint8_t scale = 8;
-    glViewport(0, 0, 160 * scale, 144 * scale);
+    glViewport(0 * scale, 0 * scale, 160 * scale, 144 * scale);
 
     Screen::init();
 }
@@ -135,6 +135,7 @@ void Window::blit()
     glClear(GL_COLOR_BUFFER_BIT);
 
     Screen::render();
+    GUI::render();
 
     glfwSwapBuffers(window);
 }
@@ -188,9 +189,6 @@ void Window::game_loop()
         }
 
         blit();
-        GUI::render();
-
-        glfwSwapBuffers(window);
 
         cycles_delta = 0;
         dots_delta = 0;

@@ -156,6 +156,8 @@ public:
      *@param y current rendering line
      */
     static void vblank(const uint8_t &y);
+
+    static void get_object_pixels(uint8_t *pixels, const uint8_t &index);
 };
 
 } // namespace emulator
