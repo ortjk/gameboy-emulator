@@ -22,12 +22,6 @@ struct opcode_values {
 
 class CPU {
 private:
-    static uint16_t af; // lower 8 bits flags register
-    static uint16_t bc;
-    static uint16_t de;
-    static uint16_t hl;
-    static uint16_t sp; // stack pointer
-    
     static bool ime; // interrupt master enable flag
     static bool halt; // whether or not the cpu is HALT-ed
 
@@ -64,6 +58,11 @@ private:
 public:
     static uint16_t t;
     static uint16_t pc; // program counter
+    static uint16_t af; // lower 8 bits flags register
+    static uint16_t bc;
+    static uint16_t de;
+    static uint16_t hl;
+    static uint16_t sp; // stack pointer
 
     /**
      *@brief Emulate a GameBoy Z80 instruction.

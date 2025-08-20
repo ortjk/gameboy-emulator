@@ -163,9 +163,9 @@ void Window::game_loop()
 
         GUI::draw();
 
-        while (cycles_delta < cycles_per_frame)
+        while (cycles_delta < cycles_per_frame && !GUI::paused)
         {
-            Motherboard::read_rom(cycles_delta);
+            uint16_t t = Motherboard::read_rom(cycles_delta);
 
             bool joypad_int = false; // only trigger joypad interrupts on key press
             if (key_update)
@@ -186,6 +186,18 @@ void Window::game_loop()
             }
 
             Motherboard::handle_interrupts();
+
+            uint16_t pc = Motherboard::get_pc();
+            if (GUI::breakpoints[pc])
+            {
+                GUI::paused = true;
+            }
+
+            if (GUI::step && t == 0)
+            {
+                GUI::paused = true;
+                GUI::step = false;
+            }
         }
 
         blit();

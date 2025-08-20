@@ -12,11 +12,11 @@ public:
     /**
      *@brief Send an instruction to the CPU from the open rom
      *
-     * Ensures a delay of 4 t-cycles.
+     * Ensures a t-cycle delay.
      *
      *@param cycles_delta CPU cycles since frame start
      */
-    static void read_rom(uint32_t &cycles_delta);
+    static const uint16_t &read_rom(uint32_t &cycles_delta);
 
     /**
      *@brief Load the bootrom and rom into memory
@@ -58,6 +58,8 @@ public:
      *@brief Allow the CPU to handle incoming interrupts
      */
     static void handle_interrupts();
+
+    static const uint16_t &get_pc();
 };
 
 } // namespace emulator
