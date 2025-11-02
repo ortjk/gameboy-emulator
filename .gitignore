@@ -4,3 +4,4 @@ build/
 roms/
 log.txt
 gmon.out
+imgui.ini
