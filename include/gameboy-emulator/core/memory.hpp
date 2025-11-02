@@ -23,10 +23,13 @@ private:
     // FF00     FF7F     I/O registers
     // FF80     FFFE     High RAM
     // FFFF     FFFF     Interrupt enable register
-
+    
 public:
     static uint8_t registers[65536];
     static uint8_t dmg[256];
+
+    static bool wrote;
+    static uint16_t last_addr;
 
     /**
      *@brief Interpret 2 bytes starting at address as a 16-bit number

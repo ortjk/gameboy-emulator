@@ -167,6 +167,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint16_t nn = bytes_to_16b(b1, b2);
                         uint16_t *reg = Memory::get_16b(nn);
                         ld(*reg, sp);
+
+                        Memory::wrote = true;
+                        Memory::last_addr = nn;
                         t = 20;
                         pc += 3;
                     }
@@ -288,6 +291,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                             {
                                 uint8_t *reg = &Memory::registers[bc];
                                 ld(*reg, *a);
+
+                                Memory::wrote = true;
+                                Memory::last_addr = bc;
                                 t = 8;
                                 pc += 1;
                             }
@@ -297,6 +303,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                             {
                                 uint8_t *reg = &Memory::registers[de];
                                 ld(*reg, *a);
+
+                                Memory::wrote = true;
+                                Memory::last_addr = de;
                                 t = 8;
                                 pc += 1;
                             }
@@ -306,6 +315,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                             {
                                 uint8_t *reg = &Memory::registers[hl];
                                 ld(*reg, *a);
+
+                                Memory::wrote = true;
+                                Memory::last_addr = hl;
                                 alu::inc(hl, *f);
                                 t = 8;
                                 pc += 1;
@@ -316,6 +328,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                             {
                                 uint8_t *reg = &Memory::registers[hl];
                                 ld(*reg, *a);
+
+                                Memory::wrote = true;
+                                Memory::last_addr = hl;
                                 alu::dec(hl, *f);
                                 t = 8;
                                 pc += 1;
@@ -659,6 +674,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint8_t *a = reinterpret_cast<uint8_t *>(&af)+1;
                         uint8_t *reg = &Memory::registers[0xFF00 + static_cast<uint16_t>(b2)];
                         ld(*reg, *a);
+
+                        Memory::wrote = true;
+                        Memory::last_addr = 0xFF00 + static_cast<uint16_t>(b2);
                         t = 12;
                         pc += 2;
 
@@ -832,6 +850,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint8_t *c = reinterpret_cast<uint8_t *>(&bc);
                         uint8_t *reg = &Memory::registers[0xFF00 + *c];
                         ld(*reg, *a);
+
+                        Memory::wrote = true;
+                        Memory::last_addr = 0xFF00 + *c;
                         t = 8;
                         pc += 1;
                     }
@@ -842,6 +863,9 @@ void CPU::instruction(const uint8_t &b3, const uint8_t &b2, const uint8_t &b1, c
                         uint16_t nn = bytes_to_16b(b1, b2);
                         uint8_t *reg = &Memory::registers[nn];
                         ld(*reg, *a);
+
+                        Memory::wrote = true;
+                        Memory::last_addr = nn;
                         t = 16;
                         pc += 3;
                     }

@@ -3,6 +3,7 @@
 #include "gameboy-emulator/core/cpu.hpp"
 #include "gameboy-emulator/core/memory.hpp"
 #include "gameboy-emulator/graphics/gpu.hpp"
+#include "gameboy-emulator/graphics/oam_dma.hpp"
 #include "gameboy-emulator/peripherals/timer.hpp"
 #include "gameboy-emulator/peripherals/joypad.hpp"
 #include "gameboy-emulator/peripherals/serial.hpp"
@@ -106,6 +107,11 @@ void Motherboard::gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &g
     }
 }
 
+void Motherboard::oam_dma_tick()
+{
+    OAMDMA::tick();
+}
+
 void Motherboard::peripheral_tick(const uint8_t &buttons, const bool &joypad_int)
 {
     Joypad::tick(buttons, joypad_int);
@@ -121,6 +127,11 @@ void Motherboard::handle_interrupts()
 const uint16_t &Motherboard::get_pc()
 {
     return CPU::pc;
+}
+
+void Motherboard::tick_over()
+{
+    Memory::wrote = false;
 }
 
 } // namespace emulator

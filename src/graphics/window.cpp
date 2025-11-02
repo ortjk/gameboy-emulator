@@ -163,7 +163,7 @@ void Window::game_loop()
 
         GUI::draw();
 
-        while (cycles_delta < cycles_per_frame && !GUI::paused)
+        while (cycles_delta < cycles_per_frame && !GUI::paused) // TODO prevent mid-frame data deletion on pause
         {
             uint16_t t = Motherboard::read_rom(cycles_delta);
 
@@ -174,6 +174,7 @@ void Window::game_loop()
                 key_update = false;
             }
 
+            Motherboard::oam_dma_tick();
             Motherboard::peripheral_tick(buttons, joypad_int);
 
             if (gpu_delay == 0)
@@ -198,6 +199,8 @@ void Window::game_loop()
                 GUI::paused = true;
                 GUI::step = false;
             }
+
+            Motherboard::tick_over();
         }
 
         blit();
