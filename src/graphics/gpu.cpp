@@ -282,4 +282,21 @@ void GPU::vblank(const uint8_t &y)
     }
 }
 
+void GPU::get_object_pixels(uint8_t *pixels, const uint8_t &index)
+{
+    const uint8_t *obj = &oam[index * 4];
+    const uint8_t *tile = &tile_data0[obj[2] * 16];
+    for (int y = 0; y < 8; y++)
+    {
+        for (int x = 0; x < 8; x++)
+        {
+            uint8_t _x = x; 
+            uint8_t _y = y;
+            if (check_bit(5, obj[3])) { _x = 7 - (_x % 8); } // vertical mirror
+            if (check_bit(6, obj[3])) { _y = 7 - (_y % 8); } // horizontal mirror
+            pixels[x + y * 8] = get_tile_pixel(tile, _x, _y);
+        }
+    }
+}
+
 } // namespace emulator

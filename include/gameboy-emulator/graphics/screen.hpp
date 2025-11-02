@@ -1,6 +1,9 @@
 #pragma once
 
+#include "gameboy-emulator/graphics/sprite.hpp"
+
 #include <cstdint>
+#include <memory>
 
 namespace emulator {
 
@@ -12,11 +15,9 @@ private:
     static const float vertices[5 * 4];
     static const unsigned int indices[3 * 2];
 
-    static unsigned int texture;
+    static std::unique_ptr<Sprite> screen_sprite;
     static unsigned int VAO;
     static unsigned int program;
-
-    static void update_texture();
 public:
     static uint8_t pixels[160 * 144];
 

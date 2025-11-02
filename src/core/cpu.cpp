@@ -11,12 +11,6 @@
 
 namespace emulator {
 
-uint16_t CPU::af = 0x0000;
-uint16_t CPU::bc = 0x0000;
-uint16_t CPU::de = 0x0000;
-uint16_t CPU::hl = 0x0000;
-uint16_t CPU::sp = 0x0000;
-
 bool CPU::ime = false;
 bool CPU::halt = false;
 
@@ -73,6 +67,11 @@ opcode_values CPU::get_opcode_values(const uint8_t &opcode)
 
 uint16_t CPU::t = 0;
 uint16_t CPU::pc = 0x0000;
+uint16_t CPU::af = 0x0000;
+uint16_t CPU::bc = 0x0000;
+uint16_t CPU::de = 0x0000;
+uint16_t CPU::hl = 0x0000;
+uint16_t CPU::sp = 0x0000;
 
 // instruction set meaning:
 // 4 byte opcodes (bracketed items may or may not be present)

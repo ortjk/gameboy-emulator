@@ -1,10 +1,11 @@
 #include "gameboy-emulator/graphics/window.hpp"
 
+#include "gameboy-emulator/graphics/gui.hpp"
 #include "gameboy-emulator/core/motherboard.hpp"
 #include "gameboy-emulator/core/bytelib.hpp"
 #include "gameboy-emulator/graphics/screen.hpp"
 
-#include <GLFW/glfw3.h>
+#include <cstddef>
 #include <math.h>
 #include <chrono>
 #include <thread>
@@ -17,18 +18,22 @@ bool Window::key_update = false;
 
 void Window::init_window()
 {
+    // initialize glfw
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    window = glfwCreateWindow(160, 144, "emulator", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "emulator", NULL, NULL);
     glfwMakeContextCurrent(window);
-
     glfwSetKeyCallback(window, on_key_press);
 
+    // initialize imgui
+    GUI::init(window);
+
+    // initialize glew/opengl
     glewInit();
-    glOrtho(0, 160, 144, 0, 1, -1);
+    glOrtho(-80, 80, 72, -72, 1, -1);
     const uint8_t scale = 8;
-    glViewport(0, 0, 160 * scale, 144 * scale);
+    glViewport(0 * scale, 0 * scale, 160 * scale, 144 * scale);
 
     Screen::init();
 }
@@ -130,6 +135,7 @@ void Window::blit()
     glClear(GL_COLOR_BUFFER_BIT);
 
     Screen::render();
+    GUI::render();
 
     glfwSwapBuffers(window);
 }
@@ -148,13 +154,18 @@ void Window::game_loop()
     uint8_t w = 0; // pixel fifo position
 
     uint8_t buttons = 0xFF; // byte that contains the input keys
+
     while (!glfwWindowShouldClose(window))
     {
         double frame_start = glfwGetTime();
 
-        while (cycles_delta < cycles_per_frame)
+        glfwPollEvents();
+
+        GUI::draw();
+
+        while (cycles_delta < cycles_per_frame && !GUI::paused)
         {
-            Motherboard::read_rom(cycles_delta);
+            uint16_t t = Motherboard::read_rom(cycles_delta);
 
             bool joypad_int = false; // only trigger joypad interrupts on key press
             if (key_update)
@@ -175,6 +186,18 @@ void Window::game_loop()
             }
 
             Motherboard::handle_interrupts();
+
+            uint16_t pc = Motherboard::get_pc();
+            if (GUI::breakpoints[pc])
+            {
+                GUI::paused = true;
+            }
+
+            if (GUI::step && t == 0)
+            {
+                GUI::paused = true;
+                GUI::step = false;
+            }
         }
 
         blit();
@@ -184,14 +207,12 @@ void Window::game_loop()
         
         int time_to_next = (int)((refreshPeriod - glfwGetTime() + frame_start) * 1000.);
         std::this_thread::sleep_for(std::chrono::milliseconds(time_to_next));
-
-
-        glfwPollEvents();
     }
 }
 
 void Window::close()
 {
+    GUI::close();
     glfwDestroyWindow(window);
     glfwTerminate();
 }

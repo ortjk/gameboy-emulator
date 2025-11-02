@@ -15,7 +15,7 @@ namespace emulator {
 uint8_t Motherboard::line = 0;
 uint8_t Motherboard::w = 0;
 
-void Motherboard::read_rom(uint32_t &cycles_delta)
+const uint16_t &Motherboard::read_rom(uint32_t &cycles_delta)
 {
     if (CPU::t == 0)
     {
@@ -25,6 +25,8 @@ void Motherboard::read_rom(uint32_t &cycles_delta)
     }
 
     CPU::t -= 4;
+
+    return CPU::t;
 }
 
 void Motherboard::load_rom(const char *boot_path, const char *rom_path)
@@ -114,6 +116,11 @@ void Motherboard::peripheral_tick(const uint8_t &buttons, const bool &joypad_int
 void Motherboard::handle_interrupts()
 {
     CPU::interrupt();
+}
+
+const uint16_t &Motherboard::get_pc()
+{
+    return CPU::pc;
 }
 
 } // namespace emulator
