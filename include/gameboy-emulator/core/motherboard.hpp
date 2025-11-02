@@ -48,6 +48,13 @@ public:
     static void gpu_process(uint8_t *pixels, uint32_t &dots_delta, uint16_t &gpu_delay);
 
     /**
+     *@brief Update the status of the OAM DMA
+     *
+     * Effectively, pass 4 M-cycles for all oam dma
+     */
+    static void oam_dma_tick();
+
+    /**
      *@brief Update the statuses of all peripherals
      *
      * Effectively, pass 4 M-cycles for all peripherals (joypad, serial, timer)
@@ -60,6 +67,8 @@ public:
     static void handle_interrupts();
 
     static const uint16_t &get_pc();
+
+    static void tick_over();
 };
 
 } // namespace emulator

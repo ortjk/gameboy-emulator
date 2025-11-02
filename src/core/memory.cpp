@@ -6,6 +6,9 @@ namespace emulator
 uint8_t Memory::registers[65536] = {};
 uint8_t Memory::dmg[256] = {};
 
+bool Memory::wrote = false;
+uint16_t Memory::last_addr = 0x0000;
+
 uint16_t *Memory::get_16b(const uint16_t &address)
 {
     return reinterpret_cast<uint16_t *>(&registers[address]);
